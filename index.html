@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#090b1a" />
+    <title>Neon Breaker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Neon Breaker, inicio">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>NEON<br />BREAKER</span>
+        </a>
+
+        <div class="stats" aria-label="Estado de la partida">
+          <div class="stat"><span>PUNTOS</span><strong id="score">000000</strong></div>
+          <div class="stat"><span>RÉCORD</span><strong id="highScore">000000</strong></div>
+          <div class="stat"><span>NIVEL</span><strong id="level">01</strong></div>
+          <div class="stat lives"><span>VIDAS</span><strong id="lives" aria-label="3 vidas"></strong></div>
+        </div>
+
+        <button class="sound-button" id="soundButton" type="button" aria-label="Desactivar sonido" title="Activar o desactivar sonido">
+          <span class="sound-icon" aria-hidden="true">)))</span>
+        </button>
+      </header>
+
+      <section class="game-stage" id="gameStage" aria-label="Área de juego">
+        <canvas id="gameCanvas" width="960" height="600"></canvas>
+        <div class="scanlines" aria-hidden="true"></div>
+
+        <div class="overlay visible" id="overlay">
+          <div class="overlay-card">
+            <p class="eyebrow" id="overlayEyebrow">CLÁSICO ARCADE</p>
+            <h1 id="overlayTitle">ROMPÉ EL<br /><em>BLOQUE</em></h1>
+            <p id="overlayText">Mové la paleta, mantené la pelota en juego y destruí todos los bloques.</p>
+            <button class="primary-button" id="startButton" type="button">
+              <span id="startButtonText">JUGAR</span><b aria-hidden="true">▶</b>
+            </button>
+            <p class="start-hint">ESPACIO PARA COMENZAR</p>
+          </div>
+        </div>
+
+        <div class="pause-badge" id="pauseBadge" aria-live="polite">PAUSA</div>
+      </section>
+
+      <footer class="controls">
+        <div class="control-group">
+          <span class="key">←</span><span class="key">→</span>
+          <span>MOVER</span>
+        </div>
+        <div class="control-group">
+          <span class="key key-wide">ESPACIO</span>
+          <span>LANZAR / PAUSA</span>
+        </div>
+        <p>También podés usar el mouse o arrastrar con el dedo</p>
+      </footer>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
