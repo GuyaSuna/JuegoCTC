@@ -49,6 +49,40 @@
   function worldHeight() { return canvas.height; }
 
   function buildLevel() {
+    if (state.level === 1) {
+      const letters = [
+        ["11111", "10000", "10000", "10000", "10000", "10000", "11111"],
+        ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+        ["11111", "10000", "10000", "10000", "10000", "10000", "11111"],
+      ];
+      const side = 70;
+      const gap = 9;
+      const letterGap = 2;
+      const cols = letters.length * 5 + (letters.length - 1) * letterGap;
+      const bw = (W - side * 2 - gap * (cols - 1)) / cols;
+      const bh = 25;
+      const top = worldHeight() <= H ? 82 : 150;
+      state.bricks = [];
+
+      letters.forEach((letter, index) => {
+        letter.forEach((pattern, row) => {
+          for (let col = 0; col < pattern.length; col++) {
+            if (pattern[col] !== "1") continue;
+            const gridCol = index * (5 + letterGap) + col;
+            state.bricks.push({
+              x: side + gridCol * (bw + gap),
+              y: top + row * (bh + gap),
+              w: bw,
+              h: bh,
+              color: palette[row % palette.length],
+              alive: true,
+            });
+          }
+        });
+      });
+      return;
+    }
+
     const cols = state.level >= 4 ? 12 : 11;
     const rows = Math.min(5 + state.level, 9);
     const side = 70;
