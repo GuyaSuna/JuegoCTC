@@ -19,11 +19,12 @@
 
   const W = 960;
   const H = 600;
+  const highScoreKey = "neonBreakerCTCHighScore";
   const palette = ["#ff3ebf", "#ef5fff", "#9669ff", "#5f88ff", "#42d9ff", "#43f3d0"];
   const state = {
     mode: "menu",
     score: 0,
-    highScore: Number(localStorage.getItem("neonBreakerHighScore")) || 0,
+    highScore: Number(localStorage.getItem(highScoreKey)) || 0,
     lives: 3,
     level: 1,
     muted: false,
@@ -49,72 +50,45 @@
   function worldHeight() { return canvas.height; }
 
   function buildLevel() {
-    if (state.level === 1) {
-      const letters = [
-        ["11111", "10000", "10000", "10000", "10000", "10000", "11111"],
-        ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
-        ["11111", "10000", "10000", "10000", "10000", "10000", "11111"],
-      ];
-      const side = 70;
-      const gap = 9;
-      const letterGap = 2;
-      const cols = letters.length * 5 + (letters.length - 1) * letterGap;
-      const bw = (W - side * 2 - gap * (cols - 1)) / cols;
-      const bh = 25;
-      const top = worldHeight() <= H ? 82 : 150;
-      state.bricks = [];
-
-      letters.forEach((letter, index) => {
-        letter.forEach((pattern, row) => {
-          for (let col = 0; col < pattern.length; col++) {
-            if (pattern[col] !== "1") continue;
-            const gridCol = index * (5 + letterGap) + col;
-            state.bricks.push({
-              x: side + gridCol * (bw + gap),
-              y: top + row * (bh + gap),
-              w: bw,
-              h: bh,
-              color: palette[row % palette.length],
-              alive: true,
-            });
-          }
-        });
-      });
-      return;
-    }
-
-    const cols = state.level >= 4 ? 12 : 11;
-    const rows = Math.min(5 + state.level, 9);
+    const letters = [
+      ["11111", "10000", "10000", "10000", "10000", "10000", "11111"],
+      ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+      ["11111", "10000", "10000", "10000", "10000", "10000", "11111"],
+    ];
     const side = 70;
     const gap = 9;
+    const letterGap = 2;
+    const cols = letters.length * 5 + (letters.length - 1) * letterGap;
     const bw = (W - side * 2 - gap * (cols - 1)) / cols;
     const bh = 25;
     const top = worldHeight() <= H ? 82 : 150;
     state.bricks = [];
 
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const stagger = row % 2 === 1 && state.level > 1;
-        if (state.level > 2 && (row + col) % 9 === 0) continue;
-        state.bricks.push({
-          x: side + col * (bw + gap) + (stagger ? 4 : 0),
-          y: top + row * (bh + gap),
-          w: bw - (stagger ? 4 : 0),
-          h: bh,
-          color: palette[row % palette.length],
-          alive: true,
-        });
-      }
-    }
+    letters.forEach((letter, index) => {
+      letter.forEach((pattern, row) => {
+        for (let col = 0; col < pattern.length; col++) {
+          if (pattern[col] !== "1") continue;
+          const gridCol = index * (5 + letterGap) + col;
+          state.bricks.push({
+            x: side + gridCol * (bw + gap),
+            y: top + row * (bh + gap),
+            w: bw,
+            h: bh,
+            color: palette[row % palette.length],
+            alive: true,
+          });
+        }
+      });
+    });
   }
 
   function resetPositions() {
-    paddle.w = Math.max(92, 144 - (state.level - 1) * 7);
+    paddle.w = 144;
     paddle.x = W / 2 - paddle.w / 2;
     paddle.y = worldHeight() - 48;
     ball.x = W / 2;
     ball.y = paddle.y - ball.r - 3;
-    ball.speed = Math.min(390 + (state.level - 1) * 28, 570);
+    ball.speed = 390;
     ball.vx = 0;
     ball.vy = 0;
     ball.stuck = true;
@@ -155,24 +129,22 @@
 
   function showEnd(won) {
     state.mode = won ? "won" : "gameover";
-    overlayEyebrow.textContent = won ? `NIVEL ${String(state.level).padStart(2, "0")} COMPLETADO` : "FIN DE LA PARTIDA";
-    overlayTitle.innerHTML = won ? "¡TODO<br><em>ROTO!</em>" : "GAME<br><em>OVER</em>";
+    overlayEyebrow.textContent = won ? "NIVEL 01 COMPLETADO" : "FIN DE LA PARTIDA";
+    overlayTitle.innerHTML = won ? "NIVEL<br><em>COMPLETO</em>" : "PREMIO<br><em>OBTENIDO</em>";
     overlayText.textContent = won
-      ? `Puntaje ${formatScore(state.score)}. La pelota irá más rápido en el próximo nivel.`
-      : `Conseguiste ${formatScore(state.score)} puntos. ¿Podés superar tu récord?`;
-    startButtonText.textContent = won ? "SIGUIENTE NIVEL" : "REINTENTAR";
+      ? `Conseguiste ${formatScore(state.score)} puntos. ¡Ganaste todos los premios: una golosina, un pegotín, un llavero y una lapicera!`
+      : `Conseguiste ${formatScore(state.score)} puntos. ${prizeForScore(state.score)}`;
+    startButtonText.textContent = "JUGAR DE NUEVO";
     overlay.classList.add("visible");
   }
 
   function hideOverlay() { overlay.classList.remove("visible"); }
 
-  function nextLevel() {
-    state.level++;
-    state.mode = "playing";
-    buildLevel();
-    resetPositions();
-    hideOverlay();
-    updateHud();
+  function prizeForScore(score) {
+    if (score <= 2000) return "Ganaste una golosina.";
+    if (score <= 3000) return "Ganaste un pegotín.";
+    if (score <= 3500) return "Ganaste un llavero.";
+    return "Ganaste una lapicera.";
   }
 
   function updateHud() {
@@ -189,7 +161,7 @@
     state.score += points;
     if (state.score > state.highScore) {
       state.highScore = state.score;
-      localStorage.setItem("neonBreakerHighScore", state.highScore);
+      localStorage.setItem(highScoreKey, state.highScore);
     }
     updateHud();
   }
@@ -248,10 +220,11 @@
         else ball.vy *= -1;
         burst(brick);
         state.shake = 2.5;
-        setScore(100 * state.level);
+        setScore(100);
         beep(460 + (state.bricks.filter(b => !b.alive).length % 8) * 45, .035, "square", .025);
         if (state.bricks.every(b => !b.alive)) {
-          window.setTimeout(() => showEnd(true), 250);
+          showEnd(true);
+          return;
         }
         break;
       }
@@ -402,8 +375,7 @@
   }
 
   function activatePrimary() {
-    if (state.mode === "menu" || state.mode === "gameover") startGame();
-    else if (state.mode === "won") nextLevel();
+    if (["menu", "gameover", "won"].includes(state.mode)) startGame();
   }
 
   document.addEventListener("keydown", event => {
@@ -443,7 +415,12 @@
   window.addEventListener("resize", () => {
     const oldHeight = canvas.height;
     fitCanvas();
-    if (oldHeight !== canvas.height) { buildLevel(); resetPositions(); }
+    if (oldHeight !== canvas.height) {
+      const survivingBricks = state.bricks.map(brick => brick.alive);
+      buildLevel();
+      state.bricks.forEach((brick, index) => { brick.alive = survivingBricks[index]; });
+      resetPositions();
+    }
   });
 
   function loop(time) {
